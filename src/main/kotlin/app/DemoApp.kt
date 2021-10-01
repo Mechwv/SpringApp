@@ -2,6 +2,10 @@ package app
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.data.annotation.Id
+import org.springframework.data.jdbc.repository.query.Query
+import org.springframework.data.relational.core.mapping.Table
+import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -24,7 +28,7 @@ class PlaceResource(service: PlaceService) {
 }
 
 @Service
-class PlaceService {
+class PlaceService(val db: MessageRepository) {
 
     fun findPlaces(): List<Place> {
         TODO()
@@ -35,7 +39,15 @@ class PlaceService {
     }
 }
 
+interface MessageRepository : CrudRepository<Place, String> {
+
+    @Query("select * from places")
+    fun findPlaces(): List<Place>
+}
+
+@Table("PLACES")
 data class Place(
+    @Id
     val id: Int,
     val latitude: Double,
     val longtitude: Double,

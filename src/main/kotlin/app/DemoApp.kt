@@ -8,6 +8,8 @@ import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @SpringBootApplication
@@ -18,28 +20,29 @@ fun main(args: Array<String>) {
 }
 
 @RestController
-class PlaceResource(service: PlaceService) {
+class PlaceResource(val service: PlaceService) {
 
     @GetMapping
-    fun index(): List<Place> = listOf(
-        Place(0,123.0, 234.0, "Blue octopus bar", null),
-        Place(0,256.5673567, 322.456345, "White octopus bar", "cool place")
-    )
+    fun index(): List<Place> = service.findPlaces()
+
+    @PostMapping
+    fun post(@RequestBody place: Place) {
+        service.post(place)
+    }
+
 }
 
 @Service
-class PlaceService(val db: MessageRepository) {
+class PlaceService(val db: PlaceRepository) {
 
-    fun findPlaces(): List<Place> {
-        TODO()
-    }
+    fun findPlaces(): List<Place> = db.findPlaces()
 
     fun post(place: Place){
-        TODO()
+        db.save(place)
     }
 }
 
-interface MessageRepository : CrudRepository<Place, String> {
+interface PlaceRepository : CrudRepository<Place, String> {
 
     @Query("select * from places")
     fun findPlaces(): List<Place>
@@ -48,9 +51,9 @@ interface MessageRepository : CrudRepository<Place, String> {
 @Table("PLACES")
 data class Place(
     @Id
-    val id: Int,
+    val id: String?,
     val latitude: Double,
     val longtitude: Double,
-    val name: String,
+    val place_name: String,
     val description: String?,
 )

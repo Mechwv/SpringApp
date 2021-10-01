@@ -10,10 +10,8 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.query
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import uuid
 
 @SpringBootApplication
 class DemoApp
@@ -27,6 +25,9 @@ class PlaceResource(val service: PlaceService) {
 
     @GetMapping
     fun index(): List<Place> = service.findPlaces()
+
+    @GetMapping("/{id}")
+    fun index(@PathVariable id: String): List<Place> = service.findPlacesById(id)
 
     @PostMapping
     fun post(@RequestBody place: Place) {
@@ -56,7 +57,7 @@ class PlaceService(val db: JdbcTemplate) {
 
     fun post(place: Place){
        db.update("insert into places values (?, ?, ?, ?, ?)",
-           place.id,
+           place.id ?: place.place_name.uuid(),
            place.latitude,
            place.longtitude,
            place.place_name,

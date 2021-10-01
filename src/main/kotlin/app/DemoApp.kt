@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.query
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.*
 import uuid
+import java.lang.Exception
 
 @SpringBootApplication
 class DemoApp
@@ -23,6 +24,9 @@ fun main(args: Array<String>) {
 @RestController
 class PlaceResource(val service: PlaceService) {
 
+    @GetMapping("/hello")
+    fun hello(): String = "Hello"
+
     @GetMapping
     fun index(): List<Place> = service.findPlaces()
 
@@ -31,7 +35,12 @@ class PlaceResource(val service: PlaceService) {
 
     @PostMapping
     fun post(@RequestBody place: Place) {
-        service.post(place)
+        try {
+            service.post(place)
+        } catch (e: Exception) {
+            println("{$e}")
+        }
+
     }
 
 }

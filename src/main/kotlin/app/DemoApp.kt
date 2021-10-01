@@ -2,10 +2,8 @@ package app
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.stereotype.Controller
-import org.springframework.ui.Model
-import org.springframework.ui.set
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RestController
 
 @SpringBootApplication
 class DemoApp
@@ -14,13 +12,20 @@ fun main(args: Array<String>) {
     runApplication<DemoApp>(*args)
 }
 
-@Controller
-class HelloController {
+@RestController
+class PlaceResource {
 
-    @GetMapping("/hello")
-    fun index(model: Model): String {
-        // https://docs.spring.io/spring-framework/docs/current/kdoc-api/spring-framework/org.springframework.ui/index.html
-        model["message"] = "Hello"
-        return "greeting"
-    }
+    @GetMapping
+    fun index(): List<Place> = listOf(
+        Place(0,123.0, 234.0, "Blue octopus bar", null),
+        Place(0,256.5673567, 322.456345, "White octopus bar", "cool place")
+    )
 }
+
+data class Place(
+    val id: Int,
+    val latitude: Double,
+    val longtitude: Double,
+    val name: String,
+    val description: String?,
+)

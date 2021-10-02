@@ -21,16 +21,30 @@ fun main(args: Array<String>) {
 @RestController
 class PlaceResource(val service: PlaceService) {
 
+    /**
+     * Метод для получения строки “Hello” при отправке get запроса на http://localhost:8080/hello
+     */
     @GetMapping("/hello")
     fun hello(): String = "Hello"
 
+    /**
+     * Метод для получения списка всех объектов типа Place из БД при отправке get запроса на http://localhost:8080/
+     */
     @GetMapping
     fun getPlaces(): List<Place> = service.findPlaces()
 
+    /**
+     * Метод для получения одного объекта типа Place из БД при отправке get запроса на http://localhost:8080/{id},
+     * где id - идентификатор сущности в таблице places
+     */
     @GetMapping("/{id}")
     fun index(@PathVariable id: String): Place? =
         service.findPlaceById(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Place not found")
 
+    /**
+     * Метод для добавления одного объекта типа Place в БД при отправке post запроса на http://localhost:8080/,
+     * post запрос должен содержать сущность Place
+     */
     @PostMapping
     fun post(@RequestBody place: Place) {
         try {
@@ -40,6 +54,10 @@ class PlaceResource(val service: PlaceService) {
         }
     }
 
+    /**
+     * Метод для удаления одного объекта типа Place из БД по id при отправке post запроса на http://localhost:8080/delete/{id},
+     * где id - идентификатор сущности в таблице places
+     */
     @PostMapping("/delete/{id}")
     fun delete(@PathVariable id: String) {
         service.deletePlaceById(id)

@@ -36,6 +36,7 @@ class PlaceResource(val service: PlaceService) {
     /**
      * Метод для получения одного объекта типа Place из БД при отправке get запроса на http://localhost:8080/{id},
      * где id - идентификатор сущности в таблице places
+     * если объект не найден, возвращается ResponseStatusException
      */
     @GetMapping("/{id}")
     fun index(@PathVariable id: String): Place? =

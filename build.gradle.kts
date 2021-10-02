@@ -4,7 +4,6 @@ plugins {
     kotlin("jvm") version "1.5.10"
     id("org.springframework.boot") version "2.4.1"
     id("io.spring.dependency-management") version "1.0.10.RELEASE"
-    kotlin("plugin.serialization") version "1.5.10" apply true
     kotlin("plugin.spring") version "1.5.10"
 }
 

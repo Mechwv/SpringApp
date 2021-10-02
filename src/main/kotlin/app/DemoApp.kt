@@ -2,15 +2,12 @@ package app
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.data.annotation.Id
-import org.springframework.data.jdbc.repository.query.Query
-import org.springframework.data.relational.core.mapping.Table
-import org.springframework.data.repository.CrudRepository
+import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.query
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import uuid
 import java.lang.Exception
 
@@ -28,10 +25,11 @@ class PlaceResource(val service: PlaceService) {
     fun hello(): String = "Hello"
 
     @GetMapping
-    fun index(): List<Place> = service.findPlaces()
+    fun getPlaces(): List<Place> = service.findPlaces()
 
     @GetMapping("/{id}")
-    fun index(@PathVariable id: String): List<Place> = service.findPlacesById(id)
+    fun index(@PathVariable id: String): Place? =
+        service.findPlaceById(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Place not found")
 
     @PostMapping
     fun post(@RequestBody place: Place) {
@@ -40,9 +38,12 @@ class PlaceResource(val service: PlaceService) {
         } catch (e: Exception) {
             println("{$e}")
         }
-
     }
 
+    @PostMapping("/delete/{id}")
+    fun delete(@PathVariable id: String) {
+        service.deletePlaceById(id)
+    }
 }
 
 @Service
@@ -58,11 +59,14 @@ class PlaceService(val db: JdbcTemplate) {
         )
     }
 
-    fun findPlacesById(id: String): List<Place> =
+    fun findPlaceById(id: String): Place? =
             db.query("select * from places where id = ?", id) { rs, _ ->
             Place(rs.getString("id"), rs.getDouble("latitude"), rs.getDouble("longtitude"),
-                rs.getString("place_name"), rs.getString("description"))}
+                rs.getString("place_name"), rs.getString("description"))}.firstOrNull()
 
+    fun deletePlaceById(id: String) {
+        db.execute("delete from places where id = '$id'")
+    }
 
     fun post(place: Place){
        db.update("insert into places values (?, ?, ?, ?, ?)",
